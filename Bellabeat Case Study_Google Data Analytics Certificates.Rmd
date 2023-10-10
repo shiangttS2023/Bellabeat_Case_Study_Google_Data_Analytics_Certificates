@@ -1,0 +1,690 @@
+---
+title: "Bellabeat Case Study_Google Data Analytics Certificates"
+author: "Shiang Ting (Noreen) Tseng"
+date: "2023-10-03"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Bellabeat Case Study_Google Data Analytics Certificates
+
+## Introduction to the Case Study
+In the dynamic intersection of wellness and technology, Bellabeat emerges as a pioneering force, crafting a unique space where health-focused innovations meet the specific needs of women. This case study, "How Can a Wellness Technology Company Play It Smart?", navigates through the intricate layers of Bellabeat’s operational and marketing strategies, unraveling the potential pathways to fortify its position in the global smart device market. Co-founded by Urška Sršen and Sando Mur, Bellabeat has not only manifested as a high-tech manufacturer of health-centric products but also as an entity that empowers women with data-driven insights into their health and habits. As we delve deeper, we will explore the company’s journey from its inception to its current standing, scrutinizing its products, marketing strategies, and the potential that smart device data analysis holds in unlocking new growth trajectories. This exploration aims to weave through the challenges and opportunities that lie ahead for Bellabeat, providing a comprehensive lens through which we can view and analyze its future prospects.
+
+## My Responsibilities and Data Analysis Process
+Navigating through the intricate pathways of data, my role as a junior data analyst unfolds, embarking on a meticulous journey through the realms of Bellabeat’s user data, with a particular focus on understanding the nuanced relationship between user activity and sleep patterns. My responsibilities are anchored in the systematic steps of the data analysis process: **ask, prepare, process, analyze, share, and act**. Initially, I will formulate critical questions, particularly probing into the correlations between users' sleep patterns and varied activity levels. The subsequent steps involve preparing and processing the data, ensuring it is primed for a thorough analysis. My analysis will delve into examining the intricate relationships among users’ sleep patterns and different activity levels, scrutinizing correlations, and identifying potential causal relationships or anomalies.
+
+The insights derived will not only be shared but will also be transformed into strategic recommendations, encompassing both marketing strategies and product improvement suggestions. I will develop insights, such as identifying correlations between activity and sleep, and translate them into strategic recommendations that span from feature development, like implementing smart alarms and enhancing the Bellabeat app, to user engagement and education, such as introducing activity-based challenges and developing educational content. Furthermore, I will recommend product enhancements and developments, ensuring they are intricately linked with the insights derived from the data, and propose marketing and communication strategies that leverage data-driven insights to enhance user engagement and brand positioning. This comprehensive approach ensures that the data not only informs but actively drives strategic decision-making and product development at Bellabeat, ensuring a symbiotic relationship between user data and organizational strategy.
+
+# ASK
+## Identifying the business task
+The main business task is to analyze smart device usage data for non-Bellabeat smart devices to identify trends and insights that can be leveraged to benefit Bellabeat and its customers.
+## Considering key stakeholders
+### The key stakeholders include: 
+Urška Sršen: As the cofounder and Chief Creative Officer of Bellabeat, Urška is the primary stakeholder who initiated this analysis. She has a vested interest in understanding how consumer behavior can shape Bellabeat's strategy.
+Sando Mur: As a key member of the Bellabeat executive team, Sando Mur will likely be interested in the insights gained from this analysis to inform high-level strategic decisions.
+Bellabeat Marketing Analytics Team: The team of data analysts is responsible for this analysis, and my recommendations will be critical to shaping Bellabeat's marketing strategy.
+### The indirect stakeholder is:
+Bellabeat Customers: While not directly involved in the analysis, understanding the needs and behaviors of Bellabeat's customers is essential for applying the insights effectively.
+## How can my insights drive business decisions?
+Through analyzing smart device usage data, I can gain insights into how consumers use non-Bellabeat smart devices. The goal of the analysis is to know what features are delighted and find useful features that can apply to one of the Bellabeat products.
+
+# Prepare
+## Step 1. Download [FitBit Fitness Tracker Data | Kaggle](https://www.kaggle.com/datasets/arashnic/fitbit). 
+## Step 2. Choose relevant files
+dailyActivity_merged.csv, heartrate_seconds_merged.csv, minuteSleep_merged.csv, dailySteps_merged.csv, and hourlySteps_merged.csv
+## Step 3. ROCCC Evaluation	
+*Reliability: The dataset is categorized as secondary data, sourced via an Amazon Mechanical Turk survey. The data collection process is not stated; therefore, it could cast doubt on data reliability.
+*Originality: The data is from a public dataset with unclear status whether it is original.
+*Comprehensiveness: The datasets cover many aspects of users’ behavior and everyday records. It could be seen to have high comprehensiveness.
+*Current: Although the timeframe of the data is a little old, the author has updated about 3 years ago. Therefore, it could be considered relevant and applicable.
+*Cited: Given the provided source from [Zenodo.org](https://zenodo.org/record/53894#.X9oeh3Uzaao) and related reading materials, the datasets could be considered as well-cited data.
+
+# PROCESS
+The "PROCESS" step in the data analysis process involves cleaning, transforming, and organizing raw data into a format that can be utilized for analysis. 
+## Step 1. Prepare the environment - R Studio Cloud
+## Step 2. Install necessary packages in R Studio Cloud
+```{r}
+install.packages("tidyverse")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("ggplot2")
+install.packages("skimr")
+install.packages("janitor")
+```
+## Step 3. Load necessary packages
+```{r}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(skimr)
+library(janitor)
+```
+## Step 4. Import the choosen five relevant datasets
+```{r}
+daily_activity <- read.csv("/cloud/project/Fitabase Data 4.12.16-5.12.16/dailyActivity_merged.csv")
+sleep_pattern <- read.csv("/cloud/project/Fitabase Data 4.12.16-5.12.16/sleepDay_merged.csv")
+# heart_rate <- read.csv("/cloud/project/Fitabase Data 4.12.16-5.12.16/heartrate_seconds_merged.csv")
+# daily_mobility_activity <- read.csv("/cloud/project/Fitabase Data 4.12.16-5.12.16/dailySteps_merged.csv")
+# hourly_mobility_activity <- read.csv("/cloud/project/Fitabase Data 4.12.16-5.12.16/hourlySteps_merged.csv")
+```
+
+## Step 5: Summarizing and Exploring data
+### Previewing the data using head(), str(), colnames()
+```{r}
+noquote("Preview of Users' Daily Activity")
+head(daily_activity)
+str(daily_activity)
+glimpse(daily_activity)
+```
+```{r}
+noquote("Preview of Column Names of Users' Daily Activity")
+colnames(daily_activity)
+```
+
+```{r}
+noquote("Preview of Users' Sleep Pattern")
+head(sleep_pattern)
+str(sleep_pattern)
+glimpse(sleep_pattern)
+```
+```{r}
+noquote("Preview of Column Names of Users' Sleep Pattern")
+colnames(sleep_pattern)
+```
+
+## Step 6. Data Cleaning Process
+* Check whether the data is duplicated.
+* Remove NA values.
+
+### Duplicated data
+```{r}
+noquote("The number of duplicated rows")
+daily_activity %>% duplicated() %>% sum() %>% cat(" duplicated rows in daily_activity. \n")
+sleep_pattern %>% duplicated() %>% sum() %>% cat(" duplicated rows in sleep_pattern. \n")
+# daily_mobility_activity %>% duplicated() %>% sum() %>% cat(" duplicated rows in daily_mobility_activity \n")
+# hourly_mobility_activity %>% duplicated() %>% sum() %>% cat(" duplicated rows in hourly_mobility_activity \n")
+# heart_rate %>% duplicated() %>% sum() %>% cat(" duplicated rows in heart_rate. \n")
+```
+* Print duplicated rows.
+```{r}
+# Identify duplicated rows
+duplicated_daily_activity_rows <- duplicated(daily_activity)
+
+# Check and display duplicated rows
+if(sum(duplicated_daily_activity_rows) > 0){
+  cat("Duplicated rows: \n")
+  print(daily_activity[duplicated_daily_activity_rows, ])
+} else {
+  cat("No duplicated rows in daily_activity. \n")
+}
+```
+```{r}
+# Identify duplicated rows by column Id and SleepDay at the same time
+duplicated_sleep_pattern_rows <- duplicated(sleep_pattern, subset = c("Id", "SleepDay")) & duplicated(sleep_pattern, subset = c("Id", "SleepDay"), fromLast = TRUE)
+
+# Check and display duplicated rows
+if(sum(duplicated_sleep_pattern_rows) > 0){
+  cat("Duplicated rows: \n")
+  print(sleep_pattern[duplicated_sleep_pattern_rows, ])
+} else {
+  cat("No duplicated rows in sleep_pattern. \n")
+}
+```
+
+### Null values
+```{r}
+noquote("The number of NULL values in rows")
+daily_activity %>% is.na() %>% sum() %>% cat(" NULL values in daily_activity. \n")
+sleep_pattern %>% is.na() %>% sum() %>% cat(" NULL values in sleep_pattern. \n")
+# heart_rate %>% is.na() %>% sum() %>% cat(" NULL values in heart_rate. \n")
+# daily_mobility_activity %>% is.na() %>% sum() %>% cat(" NULL values in daily_mobility_activity \n")
+# hourly_mobility_activity %>% is.na() %>% sum() %>% cat(" NULL values in hourly_mobility_activity \n")
+```
+* Print NULL values in rows.
+```{r}
+na_check <- is.na(daily_activity)
+if(sum(na_check) > 0){
+  cat("NULL value in rows: \n")
+  print(daily_activity[na_check, ])
+} else{
+  cat("No NULL values in daily_activity. \n")
+}
+```
+```{r}
+na_check <- is.na(sleep_pattern)
+if(sum(na_check) > 0){
+  cat("NULL value in rows: \n")
+  print(sleep_pattern[na_check, ])
+} else{
+  cat("No NULL values in daily_activity. \n")
+}
+```
+
+## Step 7. Transforming Data
+To uniform the formation of date, the column SleepDay was separated first in sleep_pattern.
+```{r}
+sleep_pattern <- sleep_pattern %>% separate(SleepDay, into = c("Date", "Time"), sep = " ", extra = "merge")
+```
+To better understand the amount of time subjects spent on daily activity, the total activity time was calculated.
+```{r}
+daily_activity <- daily_activity %>% mutate(TotalActivityTime = VeryActiveMinutes + FairlyActiveMinutes + LightlyActiveMinutes + SedentaryMinutes) 
+```
+To better understand the amount of time subjects spent on falling asleep, the sleep latency was calculated. 
+```{r}
+sleep_pattern <- sleep_pattern %>% mutate(SleepLatency = TotalTimeInBed - TotalMinutesAsleep)
+```
+
+## Step 8. Data Frames Preparation
+To review the relationship between total activities(total Steps, Distance, Time) and sleep time, the following data was extracting from daily_activity and sleep_pattern:
+```{r}
+noquote("Extraction of Total Steps, Total Distance, and Total Activity Time from daily activities")
+total_activities <- daily_activity %>% group_by(Id) %>% summarise(TotalSteps = sum(TotalSteps), TotalDistance = sum(TotalDistance), TotalActivityTime = sum(TotalActivityTime))
+
+noquote("Extraction of Total Active Steps, Total Active Distance, and Total Active Activity Time from daily activities")
+very_active_activity <- daily_activity %>% group_by(Id) %>% summarise(VeryActiveTotalDistance = sum(VeryActiveDistance), VeryActiveTotalTime = sum(VeryActiveMinutes))
+
+noquote("Extraction of Total Moderate Steps, Total Moderate Distance, and Total Moderate Activity Time from daily activities")
+mid_active_activity <- daily_activity %>% group_by(Id) %>% summarise(MidActiveTotalDistance = sum(ModeratelyActiveDistance), MidActiveTotalTime = sum(FairlyActiveMinutes))
+
+noquote("Extraction of Total Light Steps, Total Light Distance, and Total Light Activity Time from daily activities")
+light_active_activity <- daily_activity %>% group_by(Id) %>% summarise(LightActiveTotalDistance = sum(LightActiveDistance), LightActiveTotalTime = sum(LightlyActiveMinutes))
+
+noquote("Extraction of Total Sed Steps, Total Sedentary Distance, and Total Sed Activity Time from daily activities")
+sed_active_activity <- daily_activity %>% group_by(Id) %>% summarise(SedActiveTotalDistance = sum(SedentaryActiveDistance), SedActiveTotalTime = sum(SedentaryMinutes))
+
+noquote("Extraction of Total Asleep Time, Total Time in Bed, and Total Sleep Latency Time from sleep pattern")
+sleep <- sleep_pattern %>% group_by(Id) %>% summarise(AsleepTime = sum(TotalMinutesAsleep), BedTime = sum(TotalTimeInBed), SleepLatency = sum(SleepLatency))
+```
+
+## Step 9. Merging Data
+```{r}
+noquote("Total Activity <----> Sleep")
+total_activities_and_sleep <- total_activities %>% inner_join(sleep, by = c("Id"))
+
+noquote("Total Active Activity <----> Sleep")
+very_active_activities_and_sleep <- very_active_activity %>% inner_join(sleep, by = c("Id"))
+
+noquote("Total Moderate Activity <----> Sleep")
+mid_active_activity_and_sleep <- mid_active_activity %>% inner_join(sleep, by = c("Id"))
+
+noquote("Total Light Activity <----> Sleep")
+light_active_activity_and_sleep <- light_active_activity %>% inner_join(sleep, by = c("Id"))
+
+noquote("Total Sedentary Activity <----> Sleep")
+sed_active_activity_and_sleep <- sed_active_activity %>% inner_join(sleep, by = c("Id"))
+```
+
+## Step 10. Preview of All the Data Frames
+In the final step of processing data, all the data frames need to be checked for the preparation for ANALYSIS.
+```{r}
+noquote("Preview of Users' Total Activity and Sleep")
+noquote("Total Activity <----> Sleep")
+head(total_activities_and_sleep)
+str(total_activities_and_sleep)
+glimpse(total_activities_and_sleep)
+```
+```{r}
+noquote("Preview of Column Names of Users' Total Activity and Sleep")
+colnames(total_activities_and_sleep)
+```
+
+```{r}
+noquote("Preview of Users' Very Active Activity and Sleep")
+noquote("Total Active Activity <----> Sleep")
+head(very_active_activities_and_sleep)
+str(very_active_activities_and_sleep)
+glimpse(very_active_activities_and_sleep)
+```
+```{r}
+noquote("Preview of Column Names of Users' Very Active Activity and Sleep")
+colnames(very_active_activities_and_sleep)
+```
+
+```{r}
+noquote("Preview of Users' Moderate Active Activity and Sleep")
+noquote("Total Moderate Activity <----> Sleep")
+head(mid_active_activity_and_sleep)
+str(mid_active_activity_and_sleep)
+glimpse(mid_active_activity_and_sleep)
+```
+```{r}
+noquote("Preview of Column Names of Users' Moderate Active Activity and Sleep")
+colnames(mid_active_activity_and_sleep)
+```
+
+```{r}
+noquote("Preview of Users' Light Active Activity and Sleep")
+noquote("Total Light Activity <----> Sleep")
+head(light_active_activity_and_sleep)
+str(light_active_activity_and_sleep)
+glimpse(light_active_activity_and_sleep)
+```
+```{r}
+noquote("Preview of Column Names of Users' Light Active Activity and Sleep")
+colnames(light_active_activity_and_sleep)
+```
+
+```{r}
+noquote("Preview of Users' Sedentary Active Activity and Sleep")
+noquote("Total Sedentary Activity <----> Sleep")
+head(sed_active_activity_and_sleep)
+str(sed_active_activity_and_sleep)
+glimpse(sed_active_activity_and_sleep)
+```
+```{r}
+noquote("Preview of Column Names of Users' Sedentary Active Activity and Sleep")
+colnames(sed_active_activity_and_sleep)
+```
+
+
+# Analysis & SHARE
+## Correlation Examination on **Total** Activity, Sleep, and Sleep Latency
+By examining the correlation between users' total steps, total distance, total time in activity, total time of sleep, and total time of sleep latency, we can know better on the relationship between activity and sleep pattern. It can provide insights into user overall activity behaviors and sleep pattern.
+```{r}
+cor_total_step_and_asleep <- cor(total_activities_and_sleep$TotalSteps, total_activities_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_total_step_and_sleep_latency <- cor(total_activities_and_sleep$TotalSteps, total_activities_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_total_dis_and_asleep <- cor(total_activities_and_sleep$TotalDistance, total_activities_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_total_dis_and_sleep_latency <- cor(total_activities_and_sleep$TotalDistance, total_activities_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_total_activity_time_and_asleep <- cor(total_activities_and_sleep$TotalActivityTime, total_activities_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_total_activity_time_and_sleep_latency <- cor(total_activities_and_sleep$TotalActivityTime, total_activities_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+
+cat("The correlation between users' total steps and total asleep time: ") 
+print(cor_total_step_and_asleep)
+cat("The correlation between users' total steps and total sleep latency: ") 
+print(cor_total_step_and_sleep_latency)
+
+cat("The correlation between users' total distance and total asleep time: ") 
+print(cor_total_dis_and_asleep)
+cat("The correlation between users' total distance and total sleep latency: ") 
+print(cor_total_dis_and_sleep_latency)
+
+cat("The correlation between users' total time in activityies and total asleep time: ") 
+print(cor_total_activity_time_and_asleep)
+cat("The correlation between users' total time in activityies and total sleep latency: ") 
+print(cor_total_activity_time_and_sleep_latency)
+```
+#### Explanation
+**Total Steps and Total Asleep Time**
+A **weak positive correlation** exists between the total steps taken by users and their total time asleep. This suggests that as the number of steps increases, the total asleep time slightly increases. However, the relationship is not strong and therefore, other factors might also influence sleep duration.
+
+**Total Steps and Total Sleep Latency**
+A **weak positive correlation** is observed between the total steps and sleep latency (the time it takes to fall asleep). This implies that as users take more steps, the time it takes for them to fall asleep might slightly increase. However, this relationship is weak and should be interpreted cautiously.
+
+**Total Distance and Total Asleep Time**
+There is a weak positive correlation between the total distance traveled by users and their total asleep time. This suggests that users who travel more distance tend to have a slightly longer sleep duration. However, the correlation is weak, indicating that the relationship is not very strong and other factors may also play a role.
+
+**Total Distance and Total Sleep Latency**
+A **very weak positive correlation** is found between the total distance and sleep latency. This suggests that an increase in total distance traveled by users is very slightly associated with an increase in the time it takes to fall asleep. Given the weakness of this correlation, it is crucial to explore other variables that might influence sleep latency.
+
+**Total Time in Activities and Total Asleep Time**
+A **strong negative correlation** exists between the total time spent in activities and total asleep time. This indicates that as users spend more time in activities, their total asleep time tends to decrease significantly. This could suggest that higher activity levels might be associated with reduced sleep duration, which could be explored further in subsequent analyses.
+
+**Total Time in Activities and Total Sleep Latency**
+A **moderate negative correlation** is observed between the total time in activities and sleep latency. This implies that as users engage more in activities, the time it takes for them to fall asleep tends to decrease. This might suggest that more active individuals fall asleep faster, potentially due to increased tiredness or better sleep hygiene.
+
+## Correlation Examination on Activity Level and Sleep Pattern
+By examining the correlation between users' total distance and total time in different level of activity, total time of sleep, and total time of sleep latency, we can know better on the relationship between different level of activity and sleep pattern. It can provide insights into the duration of users' very active activities and sleep trends.
+
+### **Very Active** Activity, Sleep, and Sleep Latency 
+```{r}
+cor_very_active_time_and_asleep <- cor(very_active_activities_and_sleep$VeryActiveTotalTime, very_active_activities_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_very_active_time_and_sleep_latency <- cor(very_active_activities_and_sleep$VeryActiveTotalTime, very_active_activities_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_very_active_dis_and_asleep <- cor(very_active_activities_and_sleep$VeryActiveTotalDistance, very_active_activities_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_very_active_dis_and_sleep_latency <- cor(very_active_activities_and_sleep$VeryActiveTotalDistance, very_active_activities_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+
+cat("The correlation between the total distance of users' very active activity and total asleep time: ") 
+print(cor_very_active_dis_and_asleep)
+cat("The correlation between the total distance of users' very active activity and total sleep latency: ") 
+print(cor_very_active_dis_and_sleep_latency)
+
+cat("The correlation between the duration of users' very active activity in activityies and total asleep time: ") 
+print(cor_very_active_time_and_asleep)
+cat("The correlation between the duration of users' very active activity and total sleep latency: ") 
+print(cor_very_active_time_and_sleep_latency)
+```
+#### Explanation**
+**Total Distance of Very Active Activity and Total Asleep Time**
+The correlation between the total distance covered during very active activities and total asleep time is **extremely weak and negative**. This suggests that there is almost no linear relationship between these two variables. The negative sign indicates that, theoretically, as one variable increases, the other slightly decreases, but given the closeness to zero, this relationship is negligible and likely not meaningful.
+
+**Total Distance of Very Active Activity and Total Sleep Latency**
+Similarly, the correlation between the total distance of very active activity and sleep latency (time taken to fall asleep) is also **extremely weak and negative**. This implies that there is no practical linear association between how far users travel during very active activities and how quickly they fall asleep.
+
+**Duration of Very Active Activity and Total Asleep Time**
+A **weak positive correlation** is observed between the duration of very active activity and total asleep time. This suggests that as users engage in very active activities for longer durations, their total asleep time slightly increases. However, the relationship is weak, indicating that other factors might also influence sleep duration and that this finding should be interpreted with caution.
+
+**Duration of Very Active Activity and Total Sleep Latency**
+The correlation between the duration of very active activity and sleep latency is **extremely weak and positive**. This implies that there is almost no linear relationship between these two variables. The positive sign indicates that as one variable increases, the other slightly increases, but given the closeness to zero, this relationship is not practically significant.
+
+### **Moderately Active** Activity, Sleep, and Sleep Latency 
+```{r}
+cor_mid_active_time_and_asleep <- cor(mid_active_activity_and_sleep$MidActiveTotalTime, mid_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_mid_active_time_and_sleep_latency <- cor(mid_active_activity_and_sleep$MidActiveTotalTime, mid_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_mid_active_dis_and_asleep <- cor(mid_active_activity_and_sleep$MidActiveTotalDistance, mid_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_mid_active_dis_and_sleep_latency <- cor(mid_active_activity_and_sleep$MidActiveTotalDistance, mid_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+
+cat("The correlation between the total distance of users' moderately active activity and total asleep time: ") 
+print(cor_mid_active_dis_and_asleep)
+cat("The correlation between the total distance of users' moderately active activity and total sleep latency: ") 
+print(cor_mid_active_dis_and_sleep_latency)
+
+cat("The correlation between the duration of users' moderately active activity in activityies and total asleep time: ") 
+print(cor_mid_active_time_and_asleep)
+cat("The correlation between the duration of users' moderately active activity and total sleep latency: ") 
+print(cor_mid_active_time_and_sleep_latency)
+```
+#### Explanation
+**Total Distance of Moderately Active Activity and Total Asleep Time**
+A *weak positive correlation* exists between the total distance covered during moderately active activities and total asleep time. This suggests that as the distance covered during moderately active activities increases, the total asleep time slightly increases. However, the relationship is weak and should be interpreted cautiously, considering other influencing factors.
+
+**Total Distance of Moderately Active Activity and Total Sleep Latency**
+A *strong positive correlation* is observed between the total distance of moderately active activity and sleep latency (time taken to fall asleep). This implies that as users engage in moderately active activities and cover more distance, the time it takes for them to fall asleep significantly increases. This strong relationship warrants further investigation to explore potential causality and underlying factors.
+
+**Duration of Moderately Active Activity and Total Asleep Time**
+Similar to the first correlation, there is a **weak positive correlation** between the duration of moderately active activity and total asleep time. This suggests that as users engage in moderately active activities for longer durations, their total asleep time slightly increases. However, the relationship is weak and should be interpreted with caution.
+
+**Duration of Very Active Activity and Total Sleep Latency**
+A **strong positive correlation** is found between the duration of very active activity and sleep latency. This indicates that as the duration of very active activity increases, the time it takes to fall asleep also significantly increases. This strong correlation suggests a notable linear relationship between these variables, which might be explored further to understand the potential implications and causality.
+
+### **Lightly Active** Activity, Sleep, and Sleep Latency 
+```{r}
+cor_light_active_time_and_asleep <- cor(light_active_activity_and_sleep$LightActiveTotalTime, light_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_light_active_time_and_sleep_latency <- cor(light_active_activity_and_sleep$LightActiveTotalTime, light_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_light_active_dis_and_asleep <- cor(light_active_activity_and_sleep$LightActiveTotalDistance, light_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_light_active_dis_and_sleep_latency <- cor(light_active_activity_and_sleep$LightActiveTotalDistance, light_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+
+cat("The correlation between the total distance of users' lightly active activity and total asleep time: ") 
+print(cor_light_active_dis_and_asleep)
+cat("The correlation between the total distance of users' lightly active activity and total sleep latency: ") 
+print(cor_light_active_dis_and_sleep_latency)
+
+cat("The correlation between the duration of users' lightly active activity in activityies and total asleep time: ") 
+print(cor_light_active_time_and_asleep)
+cat("The correlation between the duration of users' lightly active activity and total sleep latency: ") 
+print(cor_light_active_time_and_sleep_latency)
+```
+#### Explanation
+**Total Distance of Lightly Active Activity and Total Asleep Time**
+A correlation coefficient indicates a **moderate positive** relationship between the total distance of lightly active activity and total asleep time. As the total distance covered during lightly active activities increases, the total time spent asleep also tends to increase moderately. This could suggest that engaging in lightly active activities might be somewhat beneficial for sleep duration, though other factors might also be influencing this relationship.
+
+**Total Distance of Lightly Active Activity and Total Sleep Latency**
+A correlation coefficient suggests a **very weak positive relationship** between the total distance of lightly active activity and total sleep latency. The weak correlation implies that changes in the total distance of lightly active activity are barely associated with changes in the time it takes to fall asleep. This suggests that the distance covered in lightly active activities does not significantly impact how quickly an individual falls asleep.
+
+
+**Duration of Lightly Active Activity and Total Asleep Time**
+A correlation coefficient indicates a **weak to moderate positive** relationship between the duration of lightly active activity and total asleep time. As the duration of lightly active activity increases, the total asleep time also tends to increase to some extent. This might imply that spending more time in lightly active activities could be somewhat associated with longer sleep durations, though the relationship is not very strong.
+
+**Duration of Lightly Active Activity and Total Sleep Latency**
+A correlation coefficient suggests a **very weak positive** relationship between the duration of lightly active activity and total sleep latency. This indicates that the duration of lightly active activity is barely related to the time it takes to fall asleep. The relationship is so weak that it might be negligible, suggesting that other factors are likely more influential in determining sleep latency.
+
+### **Sedentary Active** Activity, Sleep, and Sleep Latency 
+```{r}
+cor_sed_active_time_and_asleep <- cor(sed_active_activity_and_sleep$SedActiveTotalTime, sed_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_sed_active_time_and_sleep_latency <- cor(sed_active_activity_and_sleep$SedActiveTotalTime, sed_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+cor_sed_active_dis_and_asleep <- cor(sed_active_activity_and_sleep$SedActiveTotalDistance, sed_active_activity_and_sleep$AsleepTime, use = "complete.obs", method = "pearson")
+cor_sed_active_dis_and_sleep_latency <- cor(sed_active_activity_and_sleep$SedActiveTotalDistance, sed_active_activity_and_sleep$SleepLatency, use = "complete.obs", method = "pearson")
+
+cat("The correlation between the total distance of users' sedentary active activity and total asleep time: ") 
+print(cor_sed_active_dis_and_asleep)
+cat("The correlation between the total distance of users' sedentary active activity and total sleep latency: ") 
+print(cor_sed_active_dis_and_sleep_latency)
+
+cat("The correlation between the duration of users' sedentary active activity in activityies and total asleep time: ") 
+print(cor_sed_active_time_and_asleep)
+cat("The correlation between the duration of users' sedentary active activity and total sleep latency: ") 
+print(cor_sed_active_time_and_sleep_latency)
+```
+#### Explanation
+**Total Distance of Sedentary Active Activity and Total Asleep Time**
+A correlation coefficient indicates a **negligible negative** relationship between the total distance of sedentary active activity and total asleep time. This suggests that there is almost no linear relationship between the total distance covered during sedentary activities and the total time spent asleep. The negative sign indicates that as one variable slightly increases, the other slightly decreases, but the relationship is so weak it may not be meaningful.
+
+**Total Distance of Sedentary Active Activity and Total Sleep Latency**
+A correlation coefficient suggests a **weak negative** relationship between the total distance of sedentary active activity and total sleep latency.
+Explanation: This implies that as the total distance covered during sedentary activities increases, the time it takes to fall asleep (sleep latency) slightly decreases. However, the relationship is weak and may not be practically significant.
+
+**Duration of Sedentary Active Activity and Total Asleep Time**
+A correlation coefficient indicates a **strong negative** relationship between the duration of sedentary active activity and total asleep time. This suggests that as the duration of sedentary activity increases, the total time spent asleep significantly decreases. This could imply that spending more time in sedentary activities is associated with less sleep, which might be of concern and warrants further investigation.
+
+**Duration of Sedentary Active Activity and Total Sleep Latency**
+A correlation coefficient indicates a **moderate negative** relationship between the duration of sedentary active activity and total sleep latency. This means that as the duration of sedentary activity increases, the time it takes to fall asleep moderately decreases. This could suggest that more time spent in sedentary activities is associated with falling asleep faster, which might be counterintuitive and requires further exploration.
+
+# SHARE & VISUALIZE
+## Visualization for Every Correlation Coefficients
+### Correlation Coefficients of Total Activities and Asleep Duration
+```{r}
+# correlation coefficients
+correlation_coefficients <- c(cor_total_step_and_asleep, cor_total_dis_and_asleep, cor_total_activity_time_and_asleep)
+
+# Corresponding labels for each coefficient
+labels <- c("Steps", "Distance", "Time")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+# Create a scatterplot
+p <- ggplot(data, aes(x = Variable, y = Correlation)) +
+  geom_point(aes(color = Correlation), size = 5, alpha = 0.7) +
+  geom_jitter(width = 0.05) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) +
+  geom_text(aes(label = round(Correlation, 2)), vjust = -1, size = 3) +
+  labs(title = "Correlation Coefficients of Total Activities and Asleep Duration",
+       x = "Activity <---> ASleep",
+       y = "Correlation Coefficient") +
+  theme_minimal()
+
+# Display the plot
+print(p)
+```
+### Correlation Coefficients of Total Activities and Sleep Latency
+```{r}
+# correlation coefficients
+correlation_coefficients <- c(cor_total_step_and_sleep_latency, cor_total_dis_and_sleep_latency, cor_total_activity_time_and_sleep_latency)
+
+# Corresponding labels for each coefficient
+labels <- c("Steps", "Distance", "Time")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+
+# Create a scatterplot
+p <- ggplot(data, aes(x = Variable, y = Correlation)) +
+  geom_point(aes(color = Correlation), size = 5, alpha = 0.7) +
+  geom_jitter(width = 0.05) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) +
+  geom_text(aes(label = round(Correlation, 2)), vjust = -1, size = 3) +
+  labs(title = "Correlation Coefficients of Total Activities and Sleep Latency",
+       x = "Activity <---> Sleep Latency",
+       y = "Correlation Coefficient") +
+  theme_minimal()
+
+# Display the plot
+print(p)
+```
+### Very Active Activities in Sleep Latency and Asleep Duration
+```{r}
+correlation_coefficients <- c(cor_very_active_time_and_asleep, cor_very_active_dis_and_asleep, 
+            cor_very_active_time_and_sleep_latency, cor_very_active_dis_and_sleep_latency)
+
+# provided correlation labels
+labels <- c("Time & Asleep", "Distance & Asleep", 
+            "Time & Sleep Latency", "Distance & Sleep Latency")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+
+# Create a scatter plot
+p <- ggplot(data, aes(x = Variable, y = Correlation, color = Correlation)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, guide = "colourbar") +
+  geom_text(aes(label = sprintf("%.2f", Correlation)), vjust = -0.5, color = "black", size = 4) +
+  labs(title = "Very Active Activities in Sleep Latency and Asleep Duration",
+       x = NULL,
+       y = "Correlation Coefficients") +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1),
+        legend.position = "right") 
+
+# Display the plot
+print(p)
+```
+### Moderately Active Activities in Sleep Latency and Asleep Duration
+```{r}
+correlation_coefficients <- c(cor_mid_active_time_and_asleep, cor_mid_active_dis_and_asleep, 
+            cor_mid_active_time_and_sleep_latency, cor_mid_active_dis_and_sleep_latency)
+
+# provided correlation labels
+labels <- c("Time & Asleep", "Distance & Asleep", 
+            "Time & Sleep Latency", "Distance & Sleep Latency")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+
+# Create a scatter plot
+p <- ggplot(data, aes(x = Variable, y = Correlation, color = Correlation)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, guide = "colourbar") +
+  geom_text(aes(label = sprintf("%.2f", Correlation)), vjust = -0.5, color = "black", size = 4) +
+  labs(title = "Moderately Active Activities in Sleep Latency and Asleep Duration",
+       x = NULL,
+       y = "Correlation Coefficients") +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1),
+        legend.position = "right") 
+
+# Display the plot
+print(p)
+```
+### Lightly Active Activities in Sleep Latency and Asleep Duration
+```{r}
+correlation_coefficients <- c(cor_light_active_time_and_asleep, cor_light_active_dis_and_asleep, 
+            cor_light_active_time_and_sleep_latency, cor_light_active_dis_and_sleep_latency)
+
+# provided correlation labels
+labels <- c("Time & Asleep", "Distance & Asleep", 
+            "Time & Sleep Latency", "Distance & Sleep Latency")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+
+# Create a scatter plot
+p <- ggplot(data, aes(x = Variable, y = Correlation, color = Correlation)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, guide = "colourbar") +
+  geom_text(aes(label = sprintf("%.2f", Correlation)), vjust = -0.5, color = "black", size = 4) +
+  labs(title = "Lightly Active Activities in Sleep Latency and Asleep Duration",
+       x = NULL,
+       y = "Correlation Coefficients") +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1),
+        legend.position = "right") 
+
+# Display the plot
+print(p)
+```
+### Sedentary Active Activities in Sleep Latency and Asleep Duration
+```{r}
+correlation_coefficients <- c(cor_sed_active_time_and_asleep, cor_sed_active_dis_and_asleep, 
+            cor_sed_active_time_and_sleep_latency, cor_sed_active_dis_and_sleep_latency)
+
+# provided correlation labels
+labels <- c("Time & Asleep", "Distance & Asleep", 
+            "Time & Sleep Latency", "Distance & Sleep Latency")
+
+# Create a data frame
+data <- data.frame(
+  Variable = labels,
+  Correlation = correlation_coefficients
+)
+
+# Create a scatter plot
+p <- ggplot(data, aes(x = Variable, y = Correlation, color = Correlation)) +
+  geom_point(size = 4, alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  scale_color_gradient2(low = "red", high = "blue", mid = "white", midpoint = 0, guide = "colourbar") +
+  geom_text(aes(label = sprintf("%.2f", Correlation)), vjust = -0.5, color = "black", size = 4) +
+  labs(title = "Sedentary Active Activities in Sleep Latency and Asleep Duration",
+       x = NULL,
+       y = "Correlation Coefficients") +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1),
+        legend.position = "right") 
+
+# Display the plot
+print(p)
+```
+# ACT
+## Insight Development
+### Correlation Insights
+*Positive correlations between total steps, total distance, and sleep metrics suggest that higher activity levels might be associated with better sleep.
+*Negative correlations, particularly between total time in activities and sleep metrics, indicate that prolonged activity might be inversely related to sleep quality or duration.
+*Notably strong correlations (e.g., between the duration of users' sedentary active activity and total asleep time: -0.7723495) should be scrutinized for potential causal relationships or confounding factors.
+### Product Utilization
+The Bellabeat app, Leaf, Time, and Spring all offer unique data tracking capabilities that can be leveraged to enhance user wellness through informed decision-making.
+
+## Strategic Recommendations:
+### Enhance Sleep Quality
+#### Develop Features
+*Implement features in the Bellabeat app that provide insights into the relationship between different activity levels and sleep quality.
+*Create sleep improvement plans based on user activity and sleep data, offering personalized tips and strategies.
+#### User Education
+*Share insights about the importance of balancing activity and rest, leveraging data that illustrates the correlation between activity levels and sleep metrics.
+*Develop content that educates users on how to interpret and act upon their sleep and activity data.
+#### Engage Different Activity Levels
+*Activity-Based Challenges
+Introduce challenges within the Bellabeat app that encourage users to engage in various activity levels (lightly active, moderately active, very active) and track the impact on their sleep.
+*Rewards System
+Implement a rewards system that incentivizes users to participate in activity challenges and consistently log their sleep and activity data.
+#### Hydration and Wellness
+*Hydration Notifications
+Utilize the Spring bottle's data to send personalized hydration reminders, especially after periods of activity that might impact sleep quality.
+*Wellness Programs
+Integrate wellness programs in the Bellabeat membership that focus on holistic health, combining insights from activity, sleep, and hydration data to provide comprehensive wellness guidance.
+## Product Development and Enhancement
+*Smart Alarms
+Develop smart alarms for the Bellabeat app and Time watch that analyze sleep data and wake users during optimal sleep phases to enhance sleep quality.
+*Activity and Sleep Dashboard
+Enhance the Bellabeat app with a dashboard that visually represents the correlations between various activity levels and sleep metrics, aiding users in making informed wellness decisions.
+*Mindfulness and Sleep
+Integrate mindfulness exercises in the Bellabeat app that are specifically designed to enhance sleep, especially for users whose data indicates a struggle with sleep latency or quality.
+## Marketing and Communication
+*Data-Driven Marketing:
+Utilize the insights derived from the data analysis in marketing campaigns to illustrate how Bellabeat products empower users to understand and enhance their wellness.
+*Success Stories
+Encourage users to share their wellness journeys and success stories, particularly those who have seen improvements in sleep and activity by using Bellabeat products.
+*Educational Workshops
+Host workshops or webinars that educate users on the science of sleep, the impact of various activity levels on wellness, and how to utilize Bellabeat products to navigate their wellness journey.
+## Continuous Improvement
+*Feedback Mechanism
+Establish a feedback mechanism within the Bellabeat app to understand user experiences, particularly regarding new features or programs related to activity and sleep.
+*Data Monitoring
+Continuously monitor user data to identify emerging trends or shifts in correlations, ensuring that insights and recommendations remain relevant and accurate.
+*User Experience Optimization
+Regularly update the Bellabeat app and other products based on user feedback and evolving data trends to ensure optimal user experience and engagement.
+## Conclusion
+Implementing these actions will not only enhance the user experience and wellness journey but also solidify Bellabeat’s position as a brand that empowers its users with data-driven insights to navigate their health and wellness. Always ensure that user privacy and data security are paramount in all developments and communications.
+
+
